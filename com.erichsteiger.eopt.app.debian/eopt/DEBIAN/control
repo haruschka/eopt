@@ -1,0 +1,8 @@
+Package: eopt
+Version: 2.0
+Section: Graphics
+Priority: optional
+Architecture: all
+Depends: openjdk-21-jre | java-sdk (>= 17)
+Maintainer: Erich Steiger <info@erichsteiger.com>
+Description: Erichs own presenting tool is a simple program for live presentations

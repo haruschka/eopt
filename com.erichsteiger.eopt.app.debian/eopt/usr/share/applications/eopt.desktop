@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+MimeType=application/x-eopt
+Name=Erichs own presenting tool
+Exec=java -jar /usr/share/eopt/eopt-2.0.jar
+Categories=GNOME;Graphics;Office;
+Icon=/usr/share/eopt/icon128.png

@@ -1,0 +1,31 @@
+.menu-bar {
+    -fx-background-color: transparent;
+}
+.menu .label {
+    -fx-text-fill: white;
+}
+
+.menu:hover, .menu:focused, .menu:pressed {
+    -fx-background-color: darkgray;
+}
+
+.menu-item {
+    -fx-background-color: darkgray;
+}
+
+.menu-item:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+}
+.context-menu {
+    -fx-background-color: darkgray;
+}
+
+Button {
+    -fx-background-color: rgba(4, 4, 4, 0.4);
+    -fx-effect: dropshadow( one-pass-box , lightgray , 8 , 0.0 , 2 , 0 );
+    -fx-text-fill: lightgray;
+}
+
+Button:hover {
+    -fx-background-color: rgba(100, 100, 100, 0.4);
+ }
