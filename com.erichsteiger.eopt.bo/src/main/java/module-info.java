@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-module eopt.bo {
+module com.erichsteiger.eopt.bo {
   requires transitive javafx.graphics;
   requires org.slf4j;
   requires com.fasterxml.jackson.annotation;

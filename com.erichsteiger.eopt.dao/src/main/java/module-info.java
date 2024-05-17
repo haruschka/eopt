@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-module eopt.dao {
+module com.erichsteiger.eopt.dao {
   requires org.slf4j;
-  requires transitive eopt.bo;
+  requires transitive com.erichsteiger.eopt.bo;
   requires com.fasterxml.jackson.core;
   requires com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.datatype.jsr310;
