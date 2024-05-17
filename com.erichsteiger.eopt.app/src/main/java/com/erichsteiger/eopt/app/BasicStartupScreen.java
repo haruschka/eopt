@@ -16,16 +16,24 @@
 package com.erichsteiger.eopt.app;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.erichsteiger.eopt.bo.slideshow.SlideShowBO;
+import com.erichsteiger.eopt.bo.slideshow.SlideShowType;
+import com.erichsteiger.eopt.dao.SlideShowInfoIO;
 
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -49,6 +57,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class BasicStartupScreen extends VBox {
@@ -56,16 +65,20 @@ public class BasicStartupScreen extends VBox {
   private static final Logger LOGGER = LoggerFactory.getLogger(BasicStartupScreen.class);
   private Button btnNew;
   private Button btnOpen;
+  private Stage stage;
+  private HBox welcomePage;
+  private File currentWorkFile;
+  private File tempDir;
 
   BasicStartupScreen() {
     createMenu();
 
-    HBox pane = new HBox();
-    getChildren().add(pane);
-    pane.setBorder(new Border(new BorderStroke(new Color(0.9, 0.9, 0.9, 0.0),
+    welcomePage = new HBox();
+    getChildren().add(welcomePage);
+    welcomePage.setBorder(new Border(new BorderStroke(new Color(0.9, 0.9, 0.9, 0.0),
         BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(100))));
 
-    pane.setSpacing(50);
+    welcomePage.setSpacing(50);
     BackgroundImage backgroundImage = new BackgroundImage(
         new Image(getClass().getClassLoader().getResourceAsStream("initBG.jpeg")), BackgroundRepeat.NO_REPEAT,
         BackgroundRepeat.NO_REPEAT,
@@ -74,7 +87,7 @@ public class BasicStartupScreen extends VBox {
 
     setBackground(new Background(backgroundImage));
 
-    pane.setPrefHeight(1500);
+    welcomePage.setPrefHeight(1500);
 
     Label txtInfo = new Label(
         "Would you like to create a new presentation, based on a Slide-Deck exported from LibreOffice Impress or Powerpoint?");
@@ -123,17 +136,71 @@ public class BasicStartupScreen extends VBox {
     Separator separator2 = new Separator();
     separator2.setOrientation(Orientation.VERTICAL);
 
-    pane.getChildren().add(box2);
-    pane.getChildren().add(separator1);
-    pane.getChildren().add(box1);
-    pane.getChildren().add(separator2);
-    pane.getChildren().add(box3);
+    welcomePage.getChildren().add(box2);
+    welcomePage.getChildren().add(separator1);
+    welcomePage.getChildren().add(box1);
+    welcomePage.getChildren().add(separator2);
+    welcomePage.getChildren().add(box3);
 
     createVersionInfoLabel();
   }
 
   private void createNewSlideShow() {
     LOGGER.info("create new slide-show");
+    FileChooser fileChooser = new FileChooser();
+    File newFile = fileChooser.showSaveDialog(stage);
+    LOGGER.info("selected new filename {}", newFile);
+    if (newFile != null) {
+      if (!newFile.getName().toLowerCase().endsWith("." + ConstValues.EOPT_FILE_SUFFIX)) {
+        newFile = new File(newFile.getAbsolutePath() + "." + ConstValues.EOPT_FILE_SUFFIX);
+      }
+      LOGGER.info("newFile {}", newFile);
+      SlideShowInfoIO io = new SlideShowInfoIO();
+      if (newFile.getParentFile().list((File a1, String a2) -> a1.isDirectory() && a2.equals("slides")).length == 1) {
+        LOGGER.info("found slides in subdir");
+        SlideShowBO bo = io.createNewBO();
+        bo.setPresentationType(SlideShowType.DEFAULT);
+        io.writeJsonFile(newFile, bo);
+//        openSlideShow(stage, newFile);
+      } else if (newFile.getParentFile()
+          .list((File a1, String a2) -> a2.startsWith("img") && a2.endsWith(".jpg")).length > 0) {
+        LOGGER.info("found slides in dir, looks like impress");
+        SlideShowBO bo = io.createNewBO();
+        bo.setSlidesDir(".");
+        bo.setPresentationType(SlideShowType.IMPRESS);
+        io.writeJsonFile(newFile, bo);
+//        openSlideShow(stage, newFile);
+      } else if (newFile.getParentFile()
+          .list((File a1, String a2) -> a2.startsWith("Slide") && a2.endsWith(".jpeg")).length > 0) {
+        LOGGER.info("found slides in dir, looks like powerpoint export");
+        SlideShowBO bo = io.createNewBO();
+        bo.setSlidesDir(".");
+        bo.setPresentationType(SlideShowType.DEFAULT);
+        io.writeJsonFile(newFile, bo);
+//        openSlideShow(stage, newFile);
+      } else {
+        Alert a = new Alert(AlertType.NONE);
+        a.setAlertType(AlertType.INFORMATION);
+        a.setHeaderText(
+            "No JPEG Slides found. Please create the new file in the directory where your JPEG Slides are.");
+        a.show();
+
+        SlideShowBO bo = io.createNewBO();
+        bo.setSlidesDir(".");
+        bo.setPresentationType(SlideShowType.EXTENDED);
+        io.writeJsonFile(newFile, bo);
+        currentWorkFile = newFile;
+
+        try {
+          tempDir = Files.createTempDirectory("eopt-").toFile();
+          tempDir.deleteOnExit();
+        } catch (IOException e) {
+          LOGGER.error(e.getMessage(), e);
+        }
+        io.writeJsonFile(new File(tempDir.getAbsolutePath() + File.separator + "slideshow.bo"), bo);
+        welcomePage.setVisible(false);
+      }
+    }
   }
 
   private void createMenu() {
@@ -183,5 +250,6 @@ public class BasicStartupScreen extends VBox {
     stage.setScene(scene);
     stage.show();
 
+    this.stage = stage;
   }
 }

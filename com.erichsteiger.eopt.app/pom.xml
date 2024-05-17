@@ -149,6 +149,8 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
+							<finalName>${project.artifactId}-${project.version}-full</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
 							<archive>
 								<manifest>
 									<mainClass>
@@ -188,23 +190,24 @@
 				</executions>
 			</plugin>
 			<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-help-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-            <execution>
-                <id>generate-version-file</id>
-                <phase>prepare-package</phase>
-                <goals>
-                    <goal>evaluate</goal>
-                </goals>
-                <configuration>
-                    <expression>build.date</expression>
-                    <output>src/main/resources/version.info</output>
-                </configuration>
-            </execution>
-        </executions>
-    </plugin>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<executions>
+					<execution>
+						<!-- Run our version calculation script -->
+						<id>Renaming build artifacts</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>bash</executable>
+							<commandlineArgs>writeVersionFile.sh ${project.version}</commandlineArgs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 
 	</build>

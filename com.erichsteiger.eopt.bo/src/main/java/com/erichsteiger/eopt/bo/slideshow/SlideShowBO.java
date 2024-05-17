@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties
 @JsonInclude(Include.NON_NULL)
 public class SlideShowBO {
-  private Version version = new Version("1.5");
+  private Version version = new Version("2.0");
 
   private SlideShowType presentationType;
   private LabelBO title;

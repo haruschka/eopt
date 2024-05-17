@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.erichsteiger.eopt.bo.Version;
 import com.erichsteiger.eopt.bo.slideshow.SlideShowBO;
-import com.erichsteiger.eopt.bo.slideshow.SlideShowType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -43,14 +42,10 @@ public class SlideShowInfoIO extends AbstractIO {
     return null;
   }
 
-  @SuppressWarnings("removal")
   private SlideShowBO convertBO(SlideShowBO bo) {
     if (bo.getVersion().compareTo(CURRENT_VERSION) < 0) {
       LOGGER.info("need to convert from version {}", bo.getVersion());
       bo.setVersion(CURRENT_VERSION);
-      if (bo.getPresentationType() == SlideShowType.MYTH_SLIDE_SHOW) {
-        bo.setPresentationType(SlideShowType.EXTENDED);
-      }
     }
     return bo;
   }

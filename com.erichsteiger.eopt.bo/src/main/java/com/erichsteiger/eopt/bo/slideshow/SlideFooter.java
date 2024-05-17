@@ -65,7 +65,7 @@ public class SlideFooter {
     this.footerRight = footerRight;
   }
 
-  public double getFontSize() {
+  public int getFontSize() {
     return fontSize;
   }
 

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.erichsteiger.eopt.bo.slideshow;
+package com.erichsteiger.eopt.app;
 
-public enum SlideShowType {
-  DEFAULT,
-  EXTENDED,
-  IMPRESS;
+public class ConstValues {
+  public static final String EOPT_FILE_SUFFIX = "eopt";
+
 }
