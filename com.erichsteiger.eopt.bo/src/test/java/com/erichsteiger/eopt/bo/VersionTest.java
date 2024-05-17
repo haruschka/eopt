@@ -72,16 +72,23 @@ class VersionTest {
     Assertions.assertTrue(v1.toString().equals(""));
   }
 
+  @Test
   void testHashCode() {
     Version v1 = new Version("19.0.1");
     Version v2 = new Version("19.0.1");
     Assertions.assertEquals(v1.hashCode(), v2.hashCode());
   }
 
-  void testEquals() {
+  @Test
+  void testEquals1() {
     Version v1 = new Version("19.0.1");
     Version v2 = new Version("19.0.1");
     Assertions.assertEquals(v1, v2);
   }
 
+  @Test
+  void testEquals2() {
+    Version v1 = new Version("19.0.1");
+    Assertions.assertNotEquals("19.0.1", v1);
+  }
 }

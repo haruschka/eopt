@@ -30,7 +30,7 @@ public class MediaViewBO extends AbstractScreenObject {
   private double mazimizedWidth = 1;
 
   public MediaViewBO() {
-
+    // empty constructor for json serializer
   }
 
   public MediaViewBO(String videoPath) {

@@ -26,7 +26,7 @@ public class TerminalViewBO extends AbstractScreenObject {
   private String cmd = "";
 
   public TerminalViewBO() {
-
+    // empty constructor for json serializer
   }
 
   @Override
