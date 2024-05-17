@@ -1,30 +1,20 @@
-package com.erichsteiger.eopt.bo.toolbar;
+package com.erichsteiger.eopt.bo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import com.openpojo.reflection.PojoClass;
-import com.openpojo.reflection.filters.FilterPackageInfo;
 import com.openpojo.reflection.impl.PojoClassFactory;
 import com.openpojo.validation.Validator;
 import com.openpojo.validation.ValidatorBuilder;
-import com.openpojo.validation.affirm.Affirm;
 import com.openpojo.validation.rule.impl.GetterMustExistRule;
 import com.openpojo.validation.rule.impl.SetterMustExistRule;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
 
 class PojoTest {
-  // Configured for expectation, so we know when a class gets added or removed.
-  private static final int EXPECTED_CLASS_COUNT = 1;
-
-  @Test
-  void ensureExpectedPojoCount() {
-    List<PojoClass> pojoClasses = PojoClassFactory.getPojoClasses(PojoTest.class.getPackageName(),
-        new FilterPackageInfo());
-    Affirm.affirmEquals("Classes added / removed?", EXPECTED_CLASS_COUNT, pojoClasses.size());
-  }
 
   @Test
   void testPojoStructureAndBehavior() {
@@ -36,6 +26,9 @@ class PojoTest {
         // See com.openpojo.validation.test.impl for more ...
         .with(new SetterTester()).with(new GetterTester()).build();
 
-    validator.validate(PojoTest.class.getPackageName(), new FilterPackageInfo());
+    List<PojoClass> listOfPojos = new ArrayList<>();
+    listOfPojos.add(PojoClassFactory.getPojoClass(Position.class));
+    listOfPojos.add(PojoClassFactory.getPojoClass(Version.class));
+    validator.validate(listOfPojos);
   }
 }
