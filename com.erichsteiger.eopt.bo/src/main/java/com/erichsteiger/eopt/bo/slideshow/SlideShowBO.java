@@ -15,6 +15,8 @@
  */
 package com.erichsteiger.eopt.bo.slideshow;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.erichsteiger.eopt.bo.Version;
@@ -52,6 +54,8 @@ public class SlideShowBO {
   private List<String> childPresentations = null;
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private boolean changed = false;
+
+  private List<File> slides = new ArrayList<>();
 
   public boolean isChanged() {
     return changed;
@@ -194,4 +198,15 @@ public class SlideShowBO {
     this.slideTransitionType = slideTransitionType;
   }
 
+  public void addSlide(File file) {
+    slides.add(file);
+  }
+
+  public List<File> getSlides() {
+    return slides;
+  }
+
+  public void setSlides(List<File> slides) {
+    this.slides = slides;
+  }
 }

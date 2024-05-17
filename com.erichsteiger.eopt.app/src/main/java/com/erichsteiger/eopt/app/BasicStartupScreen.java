@@ -39,6 +39,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
@@ -54,8 +55,10 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -67,14 +70,18 @@ public class BasicStartupScreen extends VBox {
   private Button btnOpen;
   private Stage stage;
   private HBox welcomePage;
+  private HBox slideEditorPage;
+  private Pane main = new Pane();
   private File currentWorkFile;
   private File tempDir;
+  private SlideShowBO bo;
 
   BasicStartupScreen() {
     createMenu();
+    getChildren().add(main);
 
     welcomePage = new HBox();
-    getChildren().add(welcomePage);
+    main.getChildren().add(welcomePage);
     welcomePage.setBorder(new Border(new BorderStroke(new Color(0.9, 0.9, 0.9, 0.0),
         BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(100))));
 
@@ -87,7 +94,9 @@ public class BasicStartupScreen extends VBox {
 
     setBackground(new Background(backgroundImage));
 
-    welcomePage.setPrefHeight(1500);
+    welcomePage.setPrefHeight(600);
+    welcomePage.setPrefWidth(1024);
+    main.setPrefHeight(1500);
 
     Label txtInfo = new Label(
         "Would you like to create a new presentation, based on a Slide-Deck exported from LibreOffice Impress or Powerpoint?");
@@ -145,6 +154,24 @@ public class BasicStartupScreen extends VBox {
     createVersionInfoLabel();
   }
 
+  private void createSlideEditor() {
+    slideEditorPage = new HBox();
+
+    double rectHight = 200 * bo.getSlides().size();
+    if (rectHight < getHeight() - 40) {
+      rectHight = getHeight() - 40;
+    }
+    Rectangle rect = new Rectangle(115, rectHight, Color.BLACK);
+    ScrollPane s1 = new ScrollPane();
+    s1.setPrefSize(120, this.getHeight());
+    s1.setContent(rect);
+    s1.setTranslateX(0);
+    s1.setTranslateY(0);
+    slideEditorPage.getChildren().add(s1);
+    slideEditorPage.setVisible(false);
+    main.getChildren().add(slideEditorPage);
+  }
+
   private void createNewSlideShow() {
     LOGGER.info("create new slide-show");
     FileChooser fileChooser = new FileChooser();
@@ -156,16 +183,21 @@ public class BasicStartupScreen extends VBox {
       }
       LOGGER.info("newFile {}", newFile);
       SlideShowInfoIO io = new SlideShowInfoIO();
+      bo = io.createNewBO();
       if (newFile.getParentFile().list((File a1, String a2) -> a1.isDirectory() && a2.equals("slides")).length == 1) {
-        LOGGER.info("found slides in subdir");
-        SlideShowBO bo = io.createNewBO();
+        LOGGER.info("found slides in subdir: slides");
         bo.setPresentationType(SlideShowType.DEFAULT);
+        File dir = new File(newFile.getParentFile().getAbsolutePath() + File.separator + "slides");
+        String[] slideFiles = dir.list();
+        for (String string : slideFiles) {
+          LOGGER.debug("slides {}", string);
+          bo.addSlide(new File(dir + File.separator + string));
+        }
         io.writeJsonFile(newFile, bo);
 //        openSlideShow(stage, newFile);
       } else if (newFile.getParentFile()
           .list((File a1, String a2) -> a2.startsWith("img") && a2.endsWith(".jpg")).length > 0) {
         LOGGER.info("found slides in dir, looks like impress");
-        SlideShowBO bo = io.createNewBO();
         bo.setSlidesDir(".");
         bo.setPresentationType(SlideShowType.IMPRESS);
         io.writeJsonFile(newFile, bo);
@@ -173,33 +205,36 @@ public class BasicStartupScreen extends VBox {
       } else if (newFile.getParentFile()
           .list((File a1, String a2) -> a2.startsWith("Slide") && a2.endsWith(".jpeg")).length > 0) {
         LOGGER.info("found slides in dir, looks like powerpoint export");
-        SlideShowBO bo = io.createNewBO();
         bo.setSlidesDir(".");
         bo.setPresentationType(SlideShowType.DEFAULT);
         io.writeJsonFile(newFile, bo);
 //        openSlideShow(stage, newFile);
       } else {
-        Alert a = new Alert(AlertType.NONE);
+        Alert a = new Alert(AlertType.CONFIRMATION);
         a.setAlertType(AlertType.INFORMATION);
         a.setHeaderText(
             "No JPEG Slides found. Please create the new file in the directory where your JPEG Slides are.");
         a.show();
 
-        SlideShowBO bo = io.createNewBO();
         bo.setSlidesDir(".");
         bo.setPresentationType(SlideShowType.EXTENDED);
         io.writeJsonFile(newFile, bo);
-        currentWorkFile = newFile;
 
-        try {
-          tempDir = Files.createTempDirectory("eopt-").toFile();
-          tempDir.deleteOnExit();
-        } catch (IOException e) {
-          LOGGER.error(e.getMessage(), e);
-        }
-        io.writeJsonFile(new File(tempDir.getAbsolutePath() + File.separator + "slideshow.bo"), bo);
-        welcomePage.setVisible(false);
       }
+      currentWorkFile = newFile;
+
+      try {
+        tempDir = Files.createTempDirectory("eopt-").toFile();
+        tempDir.deleteOnExit();
+      } catch (IOException e) {
+        LOGGER.error(e.getMessage(), e);
+      }
+      io.writeJsonFile(new File(tempDir.getAbsolutePath() + File.separator + "slideshow.bo"), bo);
+      welcomePage.setVisible(false);
+      if (slideEditorPage == null) {
+        createSlideEditor();
+      }
+      slideEditorPage.setVisible(true);
     }
   }
 
