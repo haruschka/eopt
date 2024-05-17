@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.erichsteiger.eopt.bo.screenobject.ImageBO;
+import com.erichsteiger.eopt.bo.screenobject.MediaViewBO;
+import com.erichsteiger.eopt.bo.screenobject.TerminalViewBO;
 import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.impl.PojoClassFactory;
 import com.openpojo.validation.Validator;
@@ -29,6 +32,9 @@ class PojoTest {
     List<PojoClass> listOfPojos = new ArrayList<>();
     listOfPojos.add(PojoClassFactory.getPojoClass(Position.class));
     listOfPojos.add(PojoClassFactory.getPojoClass(Version.class));
+    listOfPojos.add(PojoClassFactory.getPojoClass(ImageBO.class));
+    listOfPojos.add(PojoClassFactory.getPojoClass(MediaViewBO.class));
+    listOfPojos.add(PojoClassFactory.getPojoClass(TerminalViewBO.class));
     validator.validate(listOfPojos);
   }
 }
