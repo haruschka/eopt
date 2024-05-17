@@ -30,8 +30,6 @@ public class LabelBO extends AbstractScreenObject {
   private String fgColor = "WHITE";
   private String shadowColor = "LIGHTGRAY";
   private TextShadowEffect shadowEffect = TextShadowEffect.NONE;
-  @Deprecated(since = "1.5", forRemoval = true)
-  private Boolean textShadow = Boolean.FALSE;
 
   public void setShadowColor(String shadowColor) {
     this.shadowColor = shadowColor;
@@ -71,16 +69,6 @@ public class LabelBO extends AbstractScreenObject {
 
   public String getShadowColor() {
     return shadowColor;
-  }
-
-  @Deprecated(since = "1.5", forRemoval = true)
-  public Boolean getTextShadow() {
-    return textShadow;
-  }
-
-  @Deprecated(since = "1.5")
-  public void setTextShadow(Boolean textShadow) {
-    this.textShadow = textShadow;
   }
 
   public int getFontSize() {

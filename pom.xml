@@ -14,6 +14,7 @@
 		<module>com.erichsteiger.eopt.bo</module>
 		<module>com.erichsteiger.eopt.dao</module>
 		<module>com.erichsteiger.eopt.app</module>
+		<module>com.erichsteiger.eopt.app.debian</module>
 	</modules>
 
 	<properties>

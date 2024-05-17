@@ -17,45 +17,53 @@ package com.erichsteiger.eopt.bo;
 
 public class Version implements Comparable<Version> {
 
-	private String version;
+  private String version;
 
-	public Version() {
+  public Version() {
 
-	}
+  }
 
-	public Version(String version) {
-		this.setVersion(version);
-	}
+  public Version(String version) {
+    this.setVersion(version);
+  }
 
-	public String getVersion() {
-		return version;
-	}
+  public String getVersion() {
+    return version;
+  }
 
-	public void setVersion(String version) {
-		this.version = version;
-	}
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
-	@Override
-	public int compareTo(Version o) {
-		String[] mySplits = version.split("\\.");
-		String[] otherSplits = o.getVersion().split("\\.");
-		for (int i = 0; i < mySplits.length; i++) {
-			if (otherSplits.length - 1 < (i)) {
-				return -1;
-			}
-			if (Long.valueOf(mySplits[i]).compareTo(Long.valueOf(otherSplits[i])) < 0) {
-				return -1;
-			}
-			if (Long.valueOf(mySplits[i]).compareTo(Long.valueOf(otherSplits[i])) > 0) {
-				return 1;
-			}
-		}
-		return version.compareTo(o.getVersion());
-	}
+  @Override
+  public int compareTo(Version o) {
+    String[] mySplits = version.split("\\.");
+    String[] otherSplits = o.getVersion().split("\\.");
+    for (int i = 0; i < mySplits.length; i++) {
+      if (otherSplits.length - 1 < (i)) {
+        return -1;
+      }
+      if (Long.valueOf(mySplits[i]).compareTo(Long.valueOf(otherSplits[i])) < 0) {
+        return -1;
+      }
+      if (Long.valueOf(mySplits[i]).compareTo(Long.valueOf(otherSplits[i])) > 0) {
+        return 1;
+      }
+    }
+    return version.compareTo(o.getVersion());
+  }
 
-	@Override
-	public String toString() {
-		return version == null ? "" : version;
-	}
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Version vO) {
+      return compareTo(vO) == 0;
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return version == null ? "" : version;
+  }
 
 }

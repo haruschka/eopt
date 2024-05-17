@@ -14,7 +14,7 @@
  * the License.
  */
 module eopt.bo {
-  requires javafx.graphics;
+  requires transitive javafx.graphics;
   requires org.slf4j;
   requires com.fasterxml.jackson.annotation;
 
