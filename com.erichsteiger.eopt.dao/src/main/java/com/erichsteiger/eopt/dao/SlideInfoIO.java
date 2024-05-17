@@ -21,7 +21,6 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.erichsteiger.eopt.bo.TextShadowEffect;
 import com.erichsteiger.eopt.bo.screenobject.MediaViewBO;
 import com.erichsteiger.eopt.bo.slide.SlideBO;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -52,9 +51,6 @@ public class SlideInfoIO extends AbstractIO {
 
       if (bo.getShowDemo().booleanValue()) {
         bo.getScreenObjects().add(new MediaViewBO(bo.getShowVideo()));
-      }
-      if (bo.getTitle() != null && bo.getTitle().getTextShadow().booleanValue()) {
-        bo.getTitle().setShadowEffect(TextShadowEffect.BASIC);
       }
     }
 
