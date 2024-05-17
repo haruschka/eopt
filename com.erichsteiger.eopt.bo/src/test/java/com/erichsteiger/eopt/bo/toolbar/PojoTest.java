@@ -16,25 +16,26 @@ import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
 
 class PojoTest {
-	// Configured for expectation, so we know when a class gets added or removed.
-	private static final int EXPECTED_CLASS_COUNT = 1;
+  // Configured for expectation, so we know when a class gets added or removed.
+  private static final int EXPECTED_CLASS_COUNT = 1;
 
-	@Test
-	public void ensureExpectedPojoCount() {
-		List<PojoClass> pojoClasses = PojoClassFactory.getPojoClasses(PojoTest.class.getPackageName(), new FilterPackageInfo());
-		Affirm.affirmEquals("Classes added / removed?", EXPECTED_CLASS_COUNT, pojoClasses.size());
-	}
+  @Test
+  void ensureExpectedPojoCount() {
+    List<PojoClass> pojoClasses = PojoClassFactory.getPojoClasses(PojoTest.class.getPackageName(),
+        new FilterPackageInfo());
+    Affirm.affirmEquals("Classes added / removed?", EXPECTED_CLASS_COUNT, pojoClasses.size());
+  }
 
-	@Test
-	public void testPojoStructureAndBehavior() {
-		Validator validator = ValidatorBuilder.create()
-				// Add Rules to validate structure for POJO_PACKAGE
-				// See com.openpojo.validation.rule.impl for more ...
-				.with(new GetterMustExistRule()).with(new SetterMustExistRule())
-				// Add Testers to validate behaviour for POJO_PACKAGE
-				// See com.openpojo.validation.test.impl for more ...
-				.with(new SetterTester()).with(new GetterTester()).build();
+  @Test
+  void testPojoStructureAndBehavior() {
+    Validator validator = ValidatorBuilder.create()
+        // Add Rules to validate structure for POJO_PACKAGE
+        // See com.openpojo.validation.rule.impl for more ...
+        .with(new GetterMustExistRule()).with(new SetterMustExistRule())
+        // Add Testers to validate behaviour for POJO_PACKAGE
+        // See com.openpojo.validation.test.impl for more ...
+        .with(new SetterTester()).with(new GetterTester()).build();
 
-		validator.validate(PojoTest.class.getPackageName(), new FilterPackageInfo());
-	}
+    validator.validate(PojoTest.class.getPackageName(), new FilterPackageInfo());
+  }
 }
