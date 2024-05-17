@@ -83,12 +83,19 @@ class VersionTest {
   void testEquals1() {
     Version v1 = new Version("19.0.1");
     Version v2 = new Version("19.0.1");
-    Assertions.assertEquals(v1, v2);
+    Assertions.assertTrue(v1.equals(v2));
+  }
+
+  @Test
+  void testEquals3() {
+    Version v1 = new Version("19.0.1");
+    Version v2 = new Version("11.0.1");
+    Assertions.assertFalse(v1.equals(v2));
   }
 
   @Test
   void testEquals2() {
     Version v1 = new Version("19.0.1");
-    Assertions.assertNotEquals("19.0.1", v1);
+    Assertions.assertFalse(v1.equals("19.0.1"));
   }
 }

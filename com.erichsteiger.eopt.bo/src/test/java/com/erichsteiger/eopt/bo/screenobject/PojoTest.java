@@ -1,4 +1,4 @@
-package com.erichsteiger.eopt.bo;
+package com.erichsteiger.eopt.bo.screenobject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,9 @@ class PojoTest {
         .with(new SetterTester()).with(new GetterTester()).build();
 
     List<PojoClass> listOfPojos = new ArrayList<>();
-    listOfPojos.add(PojoClassFactory.getPojoClass(Position.class));
-    listOfPojos.add(PojoClassFactory.getPojoClass(Version.class));
+    listOfPojos.add(PojoClassFactory.getPojoClass(ImageBO.class));
+    listOfPojos.add(PojoClassFactory.getPojoClass(MediaViewBO.class));
+    listOfPojos.add(PojoClassFactory.getPojoClass(TerminalViewBO.class));
     validator.validate(listOfPojos);
   }
 }

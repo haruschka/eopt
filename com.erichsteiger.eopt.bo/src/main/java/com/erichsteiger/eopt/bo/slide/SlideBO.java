@@ -39,7 +39,6 @@ public class SlideBO {
   private Boolean showFooter = Boolean.FALSE;
   private Boolean showSubtitle = Boolean.FALSE;
   private Boolean showTitle = Boolean.FALSE;
-  private List<LabelBO> labels = new ArrayList<>();
   private List<AbstractScreenObject> screenObjects = new ArrayList<>();
 
   public LabelBO getTitle() {
@@ -49,7 +48,6 @@ public class SlideBO {
   public void setTitle(LabelBO title) {
     this.title = title;
   }
-
 
   public Boolean getShowDemo() {
     return showDemo;
@@ -81,22 +79,6 @@ public class SlideBO {
 
   public void setShowSubtitle(Boolean showSubtitle) {
     this.showSubtitle = showSubtitle;
-  }
-
-  /**
-   * @deprecated replaced by screen objects
-   */
-  @Deprecated(since = "1.3", forRemoval = true)
-  public List<LabelBO> getLabels() {
-    return labels;
-  }
-
-  /**
-   * @deprecated replaced by screen objects
-   */
-  @Deprecated(since = "1.3", forRemoval = true)
-  public void setLabels(List<LabelBO> labels) {
-    this.labels = labels;
   }
 
   public Boolean getShowTitle() {
