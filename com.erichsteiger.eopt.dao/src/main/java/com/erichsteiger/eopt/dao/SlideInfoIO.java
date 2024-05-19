@@ -49,10 +49,6 @@ public class SlideInfoIO extends AbstractIO {
     }
 
     bo.setVersion(SlideBO.CURRENT_VERSION);
-
-    // fields are not in use anymore
-    bo.setShowVideo(null);
-    bo.setShowDemo(null);
     return bo;
 
   }

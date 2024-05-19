@@ -1,9 +1,9 @@
 package com.erichsteiger.eopt.bo.slideshow;
 
-import java.io.File;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import com.erichsteiger.eopt.bo.slide.SlideBO;
 
 class SlideShowBOTest {
   @Test
@@ -18,7 +18,7 @@ class SlideShowBOTest {
     SlideShowBO bo = new SlideShowBO();
     Assertions.assertNotNull(bo.getSlides());
     Assertions.assertTrue(bo.getSlides().isEmpty());
-    bo.addSlide(new File("."));
+    bo.addSlide(new SlideBO());
     Assertions.assertFalse(bo.getSlides().isEmpty());
   }
 

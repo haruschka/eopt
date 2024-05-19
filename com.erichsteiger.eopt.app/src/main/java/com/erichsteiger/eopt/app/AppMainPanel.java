@@ -19,15 +19,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.erichsteiger.eopt.bo.slide.SlideBO;
 import com.erichsteiger.eopt.bo.slideshow.SlideShowBO;
 import com.erichsteiger.eopt.bo.slideshow.SlideShowType;
 import com.erichsteiger.eopt.dao.SlideShowInfoIO;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -39,7 +44,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
@@ -50,38 +54,41 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-public class BasicStartupScreen extends VBox {
+public class AppMainPanel extends VBox {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AppMainPanel.class);
   private static final String FONT = "Arial";
-  private static final Logger LOGGER = LoggerFactory.getLogger(BasicStartupScreen.class);
   private Button btnNew;
   private Button btnOpen;
   private Stage stage;
   private HBox welcomePage;
   private HBox slideEditorPage;
-  private Pane main = new Pane();
+  private BorderPane main = new BorderPane();
   private File currentWorkFile;
   private File tempDir;
   private SlideShowBO bo;
+  private Menu menuSlide;
 
-  BasicStartupScreen() {
+  private PresentingFileHandler presentingFileHandler = new PresentingFileHandler();
+
+  AppMainPanel() {
     createMenu();
     getChildren().add(main);
 
     welcomePage = new HBox();
-    main.getChildren().add(welcomePage);
+    main.setCenter(welcomePage);
     welcomePage.setBorder(new Border(new BorderStroke(new Color(0.9, 0.9, 0.9, 0.0),
         BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(100))));
 
@@ -113,7 +120,7 @@ public class BasicStartupScreen extends VBox {
     btnNew = new Button("Create New...");
     btnNew.setOnAction(e -> createNewSlideShow());
     btnOpen = new Button("Open");
-    btnOpen.setDisable(true);
+    btnOpen.setOnAction(e -> openPresentingFile());
     VBox box1 = new VBox(txtInfo, btnNew);
     box1.setSpacing(50);
     box1.setAlignment(Pos.CENTER);
@@ -154,22 +161,55 @@ public class BasicStartupScreen extends VBox {
     createVersionInfoLabel();
   }
 
-  private void createSlideEditor() {
-    slideEditorPage = new HBox();
-
-    double rectHight = 200 * bo.getSlides().size();
-    if (rectHight < getHeight() - 40) {
-      rectHight = getHeight() - 40;
+  private void openPresentingFile() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Open .eopt File");
+    ExtensionFilter filter = new FileChooser.ExtensionFilter("EOPT files (*.eopt)", "*.eopt");
+    fileChooser.getExtensionFilters().add(filter);
+    fileChooser.setSelectedExtensionFilter(filter);
+    File file = fileChooser.showOpenDialog(stage);
+    if (file != null) {
+      Optional<String> ext = getExtensionByStringHandling(file.getAbsolutePath());
+      LOGGER.info("file {} ext {}", file, ext.isPresent());
+      if (file.exists() && ext.get().equalsIgnoreCase("eopt")) {
+        openSlideShow(file);
+      } else {
+        showAllertWrongFileType();
+      }
     }
-    Rectangle rect = new Rectangle(115, rectHight, Color.BLACK);
-    ScrollPane s1 = new ScrollPane();
-    s1.setPrefSize(120, this.getHeight());
-    s1.setContent(rect);
-    s1.setTranslateX(0);
-    s1.setTranslateY(0);
-    slideEditorPage.getChildren().add(s1);
-    slideEditorPage.setVisible(false);
-    main.getChildren().add(slideEditorPage);
+
+  }
+
+  private void openSlideShow(File file) {
+    this.currentWorkFile = file;
+    tempDir = presentingFileHandler.openFile(file);
+    bo = presentingFileHandler.readSlidShowBO(tempDir);
+    welcomePage.setVisible(false);
+    createSlideEditor();
+    slideEditorPage.setVisible(true);
+    menuSlide.setVisible(true);
+
+  }
+
+  private void showAllertWrongFileType() {
+    Alert a = new Alert(AlertType.NONE);
+    a.setAlertType(AlertType.ERROR);
+    a.setHeaderText("You got the wrong file type.\nPlease select an .eopt file");
+    a.show();
+  }
+
+  private Optional<String> getExtensionByStringHandling(String filename) {
+    return Optional.ofNullable(filename)
+        .filter(f -> f.contains("."))
+        .map(f -> f.substring(filename.lastIndexOf(".") + 1));
+  }
+
+  private void createSlideEditor() {
+    main.getChildren().remove(slideEditorPage);
+    slideEditorPage = new SlideShowEditorPanel(bo, tempDir, menuSlide);
+    slideEditorPage.setVisible(true);
+    main.setCenter(slideEditorPage);
+    BorderPane.setMargin(slideEditorPage, new Insets(12, 12, 12, 12));
   }
 
   private void createNewSlideShow() {
@@ -188,13 +228,12 @@ public class BasicStartupScreen extends VBox {
         LOGGER.info("found slides in subdir: slides");
         bo.setPresentationType(SlideShowType.DEFAULT);
         File dir = new File(newFile.getParentFile().getAbsolutePath() + File.separator + "slides");
-        String[] slideFiles = dir.list();
-        for (String string : slideFiles) {
-          LOGGER.debug("slides {}", string);
-          bo.addSlide(new File(dir + File.separator + string));
+        List<File> slideFiles = Arrays.asList(dir.listFiles());
+        Collections.sort(slideFiles);
+        for (File slideFile : slideFiles) {
+          LOGGER.info("slides {}", slideFile);
+          bo.addSlide(new SlideBO("./slides" + File.separator + slideFile.getName()));
         }
-        io.writeJsonFile(newFile, bo);
-//        openSlideShow(stage, newFile);
       } else if (newFile.getParentFile()
           .list((File a1, String a2) -> a2.startsWith("img") && a2.endsWith(".jpg")).length > 0) {
         LOGGER.info("found slides in dir, looks like impress");
@@ -223,18 +262,13 @@ public class BasicStartupScreen extends VBox {
       }
       currentWorkFile = newFile;
 
-      try {
-        tempDir = Files.createTempDirectory("eopt-").toFile();
-        tempDir.deleteOnExit();
-      } catch (IOException e) {
-        LOGGER.error(e.getMessage(), e);
-      }
-      io.writeJsonFile(new File(tempDir.getAbsolutePath() + File.separator + "slideshow.bo"), bo);
+      tempDir = presentingFileHandler.createTempFiles(bo, currentWorkFile);
+      presentingFileHandler.createPresentingFile(tempDir, currentWorkFile.getAbsolutePath());
       welcomePage.setVisible(false);
-      if (slideEditorPage == null) {
-        createSlideEditor();
-      }
+      createSlideEditor();
       slideEditorPage.setVisible(true);
+      menuSlide.setVisible(true);
+
     }
   }
 
@@ -245,12 +279,18 @@ public class BasicStartupScreen extends VBox {
     MenuItem createNew = new MenuItem("Create new");
     createNew.setOnAction(e -> createNewSlideShow());
     createNew.setAccelerator(KeyCombination.keyCombination("CTRL+N"));
+    MenuItem openFile = new MenuItem("Open SlideShow");
+    openFile.setOnAction(e -> openPresentingFile());
+    openFile.setAccelerator(KeyCombination.keyCombination("CTRL+O"));
     MenuItem exit = new MenuItem("Exit");
     exit.setOnAction(e -> System.exit(0));
     exit.setAccelerator(KeyCombination.keyCombination("Q"));
-    menuFile.getItems().addAll(createNew, new SeparatorMenuItem(), exit);
+    menuFile.getItems().addAll(createNew, openFile, new SeparatorMenuItem(), exit);
 
-    menuBar.getMenus().addAll(menuFile);
+    menuSlide = new Menu("_Slide");
+    menuSlide.setVisible(false);
+
+    menuBar.getMenus().addAll(menuFile, menuSlide);
     this.getChildren().addAll(menuBar);
   }
 

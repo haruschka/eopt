@@ -28,11 +28,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 public class SlideBO {
-  public static final Version CURRENT_VERSION = new Version("1.5");
+  public static final Version CURRENT_VERSION = new Version("2.0");
 
   private Version version = CURRENT_VERSION;
-  private Boolean showDemo = Boolean.FALSE;
-  private String showVideo = "";
   private LabelBO title = new LabelBO();
   private LabelBO subtitle;
 
@@ -41,28 +39,22 @@ public class SlideBO {
   private Boolean showTitle = Boolean.FALSE;
   private List<AbstractScreenObject> screenObjects = new ArrayList<>();
 
+  private String backgroundImagePath;
+
+  public SlideBO() {
+    // empty for json serializer
+  }
+
+  public SlideBO(String backgroundImagePath) {
+    this.backgroundImagePath = backgroundImagePath;
+  }
+
   public LabelBO getTitle() {
     return title;
   }
 
   public void setTitle(LabelBO title) {
     this.title = title;
-  }
-
-  public Boolean getShowDemo() {
-    return showDemo;
-  }
-
-  public void setShowDemo(Boolean showDemo) {
-    this.showDemo = showDemo;
-  }
-
-  public String getShowVideo() {
-    return showVideo;
-  }
-
-  public void setShowVideo(String showVideo) {
-    this.showVideo = showVideo;
   }
 
   public Boolean getShowFooter() {
@@ -111,6 +103,14 @@ public class SlideBO {
 
   public void setSubtitle(LabelBO subtitle) {
     this.subtitle = subtitle;
+  }
+
+  public String getBackgroundImagePath() {
+    return backgroundImagePath;
+  }
+
+  public void setBackgroundImagePath(String backgroundImagePath) {
+    this.backgroundImagePath = backgroundImagePath;
   }
 
 }

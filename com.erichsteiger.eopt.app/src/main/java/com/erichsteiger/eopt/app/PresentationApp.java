@@ -55,11 +55,8 @@ public class PresentationApp extends Application {
   }
 
   private void showBasicStartupScreen(Stage stage) {
-    BasicStartupScreen main = new BasicStartupScreen();
+    AppMainPanel main = new AppMainPanel();
     main.show(stage);
-//    main.getBtnNew().setOnMouseClicked(e -> createNewSlideShow(stage));
-//    main.getBtnOpen().setOnMouseClicked(e -> openSlideShow(stage));
-
   }
 
   public Optional<String> getExtensionByStringHandling(String filename) {

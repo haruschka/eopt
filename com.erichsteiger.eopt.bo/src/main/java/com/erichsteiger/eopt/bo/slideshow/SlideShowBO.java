@@ -15,13 +15,13 @@
  */
 package com.erichsteiger.eopt.bo.slideshow;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.erichsteiger.eopt.bo.Version;
 import com.erichsteiger.eopt.bo.light.FlashLightBO;
 import com.erichsteiger.eopt.bo.screenobject.LabelBO;
+import com.erichsteiger.eopt.bo.slide.SlideBO;
 import com.erichsteiger.eopt.bo.toolbar.ToolBarBO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -55,7 +55,7 @@ public class SlideShowBO {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private boolean changed = false;
 
-  private List<File> slides = new ArrayList<>();
+  private List<SlideBO> slides = new ArrayList<>();
 
   public boolean isChanged() {
     return changed;
@@ -198,15 +198,15 @@ public class SlideShowBO {
     this.slideTransitionType = slideTransitionType;
   }
 
-  public void addSlide(File file) {
+  public void addSlide(SlideBO file) {
     slides.add(file);
   }
 
-  public List<File> getSlides() {
+  public List<SlideBO> getSlides() {
     return slides;
   }
 
-  public void setSlides(List<File> slides) {
+  public void setSlides(List<SlideBO> slides) {
     this.slides = slides;
   }
 }
