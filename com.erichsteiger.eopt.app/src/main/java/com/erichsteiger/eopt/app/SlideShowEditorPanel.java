@@ -48,6 +48,11 @@ public class SlideShowEditorPanel extends HBox {
     setVisible(false);
   }
 
+  public void saveFile(String fileName) {
+    presentingFileHandler.saveBO(tempDir, bo);
+    presentingFileHandler.createPresentingFile(tempDir, fileName);
+  }
+
   private void refreshThumbnails() {
     ContextMenu contextMenu = new ContextMenu();
     MenuItem deleteSlide = new MenuItem("Delete Slide");
@@ -111,8 +116,13 @@ public class SlideShowEditorPanel extends HBox {
   private void deleteSlide(ActionEvent e) {
     LOGGER.debug("delete slide {}", e);
     if (e.getSource() instanceof MenuItem item) {
-      LOGGER.debug("delete user-data {}", item.getUserData());
+      LOGGER.info("delete user-data {}", item.getUserData());
       if (item.getUserData() instanceof ImageView thumbImg) {
+        LOGGER.info("thumbImg.getUserDate  {}", thumbImg.getUserData());
+        if (thumbImg.getUserData() instanceof SlideBO slideBO) {
+          bo.getSlides().remove(slideBO);
+          new File(tempDir + File.separator + slideBO.getBackgroundImagePath()).delete();
+        }
         thumbNails.getChildren().remove(thumbImg);
       }
     }

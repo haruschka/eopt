@@ -27,17 +27,19 @@ public class PresentingFileHandler {
   private SlideShowInfoIO io = new SlideShowInfoIO();
 
   public File createTempFiles(SlideShowBO bo, File currentWorkFile) {
+    LOGGER.info("currentWorkFile {}", currentWorkFile);
     File tempDir = createTempDir();
 
     io.writeJsonFile(
         new File(tempDir.getAbsolutePath() + File.separator + SLIDESHOW_BO_FILE_NAME), bo);
     File tempSlideDir = new File(tempDir.getAbsolutePath() + File.separator + SLIDES_SUB_DIRECTORY);
     tempSlideDir.mkdir();
+    LOGGER.info("tempSlideDir {}", tempSlideDir);
     for (SlideBO slide : bo.getSlides()) {
       slide.setBackgroundImagePath(copySlideToTempDir(
-          new File(currentWorkFile.getParentFile().getParentFile().getAbsolutePath() + File.separator
+          new File(currentWorkFile.getParentFile().getAbsolutePath() + File.separator
               + slide.getBackgroundImagePath()),
-          tempSlideDir));
+          tempDir.getAbsoluteFile()));
 
     }
     return tempDir;
@@ -81,16 +83,13 @@ public class PresentingFileHandler {
   }
 
   public void createPresentingFile(File tempDir, String targetFileName) {
-    try {
-      FileOutputStream fos = new FileOutputStream(targetFileName);
-      ZipOutputStream zipOut = new ZipOutputStream(fos);
+    try (FileOutputStream fos = new FileOutputStream(targetFileName);
+        ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
       for (File fileToZip : tempDir.listFiles()) {
         zipFile(fileToZip, fileToZip.getName(), zipOut);
       }
 
-      zipOut.close();
-      fos.close();
     } catch (Exception e) {
       LOGGER.error("cannot zip file on temp dir {}", tempDir.getAbsolutePath());
     }
@@ -178,5 +177,10 @@ public class PresentingFileHandler {
 
   public SlideShowBO readSlidShowBO(File tempDir) {
     return io.readJson(new File(tempDir.getAbsolutePath() + File.separator + SLIDESHOW_BO_FILE_NAME));
+  }
+
+  public void saveBO(File tempDir, SlideShowBO bo) {
+    io.writeJsonFile(
+        new File(tempDir.getAbsolutePath() + File.separator + SLIDESHOW_BO_FILE_NAME), bo);
   }
 }

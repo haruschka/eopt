@@ -74,7 +74,7 @@ public class AppMainPanel extends VBox {
   private Button btnOpen;
   private Stage stage;
   private HBox welcomePage;
-  private HBox slideEditorPage;
+  private SlideShowEditorPanel slideEditorPage;
   private BorderPane main = new BorderPane();
   private File currentWorkFile;
   private File tempDir;
@@ -82,6 +82,7 @@ public class AppMainPanel extends VBox {
   private Menu menuSlide;
 
   private PresentingFileHandler presentingFileHandler = new PresentingFileHandler();
+  private MenuItem saveFile;
 
   AppMainPanel() {
     createMenu();
@@ -206,6 +207,9 @@ public class AppMainPanel extends VBox {
 
   private void createSlideEditor() {
     main.getChildren().remove(slideEditorPage);
+    saveFile.setDisable(false);
+    saveFile.setOnAction(e -> slideEditorPage.saveFile(currentWorkFile.getAbsolutePath()));
+
     slideEditorPage = new SlideShowEditorPanel(bo, tempDir, menuSlide);
     slideEditorPage.setVisible(true);
     main.setCenter(slideEditorPage);
@@ -285,7 +289,10 @@ public class AppMainPanel extends VBox {
     MenuItem exit = new MenuItem("Exit");
     exit.setOnAction(e -> System.exit(0));
     exit.setAccelerator(KeyCombination.keyCombination("Q"));
-    menuFile.getItems().addAll(createNew, openFile, new SeparatorMenuItem(), exit);
+    saveFile = new MenuItem("Save");
+    saveFile.setAccelerator(KeyCombination.keyCombination("CTRL+S"));
+    saveFile.setDisable(true);
+    menuFile.getItems().addAll(createNew, openFile, new SeparatorMenuItem(), saveFile, new SeparatorMenuItem(), exit);
 
     menuSlide = new Menu("_Slide");
     menuSlide.setVisible(false);
@@ -327,4 +334,5 @@ public class AppMainPanel extends VBox {
 
     this.stage = stage;
   }
+
 }
