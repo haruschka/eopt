@@ -32,6 +32,7 @@ import com.erichsteiger.eopt.bo.slideshow.SlideShowBO;
 import com.erichsteiger.eopt.bo.slideshow.SlideShowType;
 import com.erichsteiger.eopt.dao.SlideShowInfoIO;
 
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -40,6 +41,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -87,6 +89,10 @@ public class AppMainPanel extends VBox {
   AppMainPanel() {
     createMenu();
     getChildren().add(main);
+    heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue,
+        Number newValue) -> resize(getWidth(), newValue.doubleValue()));
+    widthProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue,
+        Number newValue) -> resize(newValue.doubleValue(), getHeight()));
 
     welcomePage = new HBox();
     main.setCenter(welcomePage);
@@ -162,6 +168,22 @@ public class AppMainPanel extends VBox {
     createVersionInfoLabel();
   }
 
+  @Override
+  public void resize(double width, double height) {
+    super.resize(width, height);
+    LOGGER.info("width {} height {}", width, height);
+    main.setMaxSize(width, height);
+    main.setPrefHeight(height);
+    main.setPrefWidth(height);
+
+    if (slideEditorPage != null) {
+      slideEditorPage.setMaxSize(width, height);
+      slideEditorPage.setPrefHeight(height - 120);
+      slideEditorPage.setPrefWidth(height);
+
+    }
+  }
+
   private void openPresentingFile() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Open .eopt File");
@@ -211,6 +233,7 @@ public class AppMainPanel extends VBox {
     saveFile.setOnAction(e -> slideEditorPage.saveFile(currentWorkFile.getAbsolutePath()));
 
     slideEditorPage = new SlideShowEditorPanel(bo, tempDir, menuSlide);
+
     slideEditorPage.setVisible(true);
     main.setCenter(slideEditorPage);
     BorderPane.setMargin(slideEditorPage, new Insets(12, 12, 12, 12));
@@ -331,7 +354,19 @@ public class AppMainPanel extends VBox {
     scene.setFill(null);
     stage.setScene(scene);
     stage.show();
+    stage.setOnCloseRequest(e -> {
+      if (slideEditorPage != null && slideEditorPage.isChanged()) {
+        Alert alert = new Alert(AlertType.WARNING, "There are changes in your Presentation. Do you want to save it?",
+            ButtonType.OK,
+            ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
 
+        if (result.get() == ButtonType.OK) {
+          slideEditorPage.saveFile(currentWorkFile.getAbsolutePath());
+          tempDir.delete();
+        }
+      }
+    });
     this.stage = stage;
   }
 
