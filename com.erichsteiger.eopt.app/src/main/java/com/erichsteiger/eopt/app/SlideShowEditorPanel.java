@@ -5,6 +5,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.erichsteiger.eopt.app.slideshow.SlidePane;
 import com.erichsteiger.eopt.bo.slide.SlideBO;
 import com.erichsteiger.eopt.bo.slideshow.SlideShowBO;
 
@@ -125,7 +126,10 @@ public class SlideShowEditorPanel extends Pane {
     stage.setTitle(bo.getTitle() == null ? "eOPT" : bo.getTitle().getText());
     stage.setFullScreenExitHint("");
 
-    Pane slideShow = new Pane();
+    Pane slideShow = new SlidePane(
+        new File(tempDir.getAbsolutePath() + File.separator + bo.getSlides().get(0).getBackgroundImagePath()).toURI()
+            .toString(),
+        tempDir);
     Scene scene = new Scene(slideShow, 1024, 575);
     if (bo.getStartFullscreen().booleanValue()) {
       stage.setMaximized(true);
