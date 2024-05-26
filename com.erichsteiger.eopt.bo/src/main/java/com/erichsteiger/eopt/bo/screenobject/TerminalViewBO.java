@@ -23,7 +23,6 @@ public class TerminalViewBO extends AbstractScreenObject {
   private double width = 0.2;
   private double height = 0.2;
   private String title = "Demo";
-  private String cmd = "";
 
   public TerminalViewBO() {
     // empty constructor for json serializer
@@ -74,11 +73,4 @@ public class TerminalViewBO extends AbstractScreenObject {
     this.title = title;
   }
 
-  public String getCmd() {
-    return cmd;
-  }
-
-  public void setCmd(String cmd) {
-    this.cmd = cmd;
-  }
 }

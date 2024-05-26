@@ -54,14 +54,13 @@ public class CustomeTerminalView extends Pane implements IRepositionable {
     this.getChildren().add(tabPane);
 
     TerminalBuilder terminalBuilder = new TerminalBuilder(darkConfig);
-//    terminalBuilder.setTerminalPath(Path.of(URI.create("file:/home/erich/")));
     terminal = terminalBuilder.newTerminal();
     terminal.setText(bo.getTitle());
     terminal.setClosable(false);
     terminal.getTerminalConfig().setFontSize(20);
 
     terminal.onTerminalFxReady(() -> {
-      terminal.getTerminal().command(bo.getCmd());
+      terminal.getTerminal().command("");
     });
 
     terminal.getTerminal().setOnKeyPressed(e -> {
